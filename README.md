@@ -1,4 +1,4 @@
-# DBInputNote ———— 如我所述 如我所书
+# DBInputNote ——— 如我所述 如我所书
 一个用来写网文的文本编辑器，在创作阶段就以分段录入的形式准备语音训练的标注数据，（即将）支持语音识别，（即将）支持闲时语音模型自训练，为每一本书准备一个最合适的模型
 # 编辑页面
 <img width="1372" height="1029" alt="image" src="https://github.com/user-attachments/assets/c3c69890-40d4-4077-b7a8-ad9b76c7ffcd" />
@@ -12,3 +12,4 @@
 
 这是一个flask的应用，启动后你可以在同局域网下的其他设备访问，或将其移植到全平台
 
+<img width="762" height="762" alt="image" src="https://github.com/user-attachments/assets/1fd72cf7-f217-4b56-ac6f-bfdbc6bf9bcb" />
