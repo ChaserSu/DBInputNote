@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分段编辑器  - 如我所述 如我所书 </title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        header {
+            background-color: #4a90e2;
+            color: white;
+            padding: 15px 0;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-content h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .header-content .back-btn {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .header-content .back-btn:hover {
+            background-color: rgba(255,255,255,0.3);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .editor-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .editor-panel {
+            padding: 20px;
+            border-right: 1px solid #eee;
+            max-height: calc(100vh - 150px);
+            overflow-y: auto;
+        }
+        
+        .preview-panel {
+            padding: 20px;
+            background-color: #fafafa;
+            max-height: calc(100vh - 150px);
+            overflow-y: auto;
+        }
+        
+        .panel-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .paragraph {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .paragraph:hover {
+            border-color: #4a90e2;
+            box-shadow: 0 2px 8px rgba(74, 144, 226, 0.15);
+        }
+        
+        .paragraph-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .paragraph-number {
+            font-weight: 600;
+            color: #4a90e2;
+            font-size: 16px;
+        }
+        
+        .paragraph-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background-color: #4a90e2;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #357abd;
+        }
+        
+        .btn-secondary {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #d0d0d0;
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-success {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+        
+        .paragraph-content {
+            margin-bottom: 10px;
+        }
+        
+        .paragraph-text {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+        
+        .paragraph-text:focus {
+            outline: none;
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+        }
+        
+        .recording-status {
+            font-size: 12px;
+            color: #e74c3c;
+            margin-left: 10px;
+        }
+        
+        .recording-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .recording-active {
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .audio-info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .preview-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            font-size: 16px;
+            line-height: 2.0;
+        }
+        
+        .preview-content p {
+            text-indent: 2em;
+            margin: 0 0 10px 0;
+        }
+        
+        .preview-actions {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .copy-btn {
+            padding: 8px 16px;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .copy-btn:hover {
+            background-color: #357abd;
+        }
+        
+        .copy-btn.copied {
+            background-color: #2ecc71;
+        }
+        
+        .add-paragraph-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background-color: #f0f0f0;
+            color: #666;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .add-paragraph-btn:hover {
+            background-color: #e8e8e8;
+            border-color: #4a90e2;
+            color: #4a90e2;
+        }
+        
+        .status-message {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div>
+                <a href="/" class="back-btn" style="margin-right: 10px;">← 返回书架</a>
+                <a href="/book/{{ book_id }}" class="back-btn">← 返回章节列表</a>
+            </div>
+            <h1>分段编辑器 - 如我所述 如我所书</h1>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div id="status-message" class="status-message" style="display: none;"></div>
+        
+        <div class="editor-layout">
+            <!-- 左侧编辑器面板 -->
+            <div class="editor-panel">
+                <h2 class="panel-title">分段编辑</h2>
+                <div id="paragraphs-list"></div>
+                <button class="add-paragraph-btn" onclick="addParagraph()">+ 添加新段落</button>
+            </div>
+            
+            <!-- 右侧预览面板 -->
+            <div class="preview-panel">
+                <h2 class="panel-title">实时预览</h2>
+                <div class="preview-actions">
+                    <button class="copy-btn" onclick="copyToClipboard()">复制全文</button>
+                </div>
+                <div id="preview-content" class="preview-content">
+                    <p>开始编辑，这里将实时显示所有段落内容...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 批量导入模态框 -->
+    <div id="batch-import-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>批量导入段落</h3>
+            </div>
+            <div class="form-group">
+                <label for="batch-text">请输入要导入的文本（每行一个段落）</label>
+                <textarea id="batch-text" style="width: 100%; min-height: 200px; padding: 10px; font-size: 16px;"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeBatchImportModal()">取消</button>
+                <button type="button" class="btn btn-primary" onclick="batchImportParagraphs()">导入</button>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s ease;
+        }
+        
+        .modal-header {
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h3 {
+            font-size: 20px;
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+    
+    <script>
+        let bookId = '{{ book_id }}';
+        let chapterId = '{{ chapter_id }}';
+        let paragraphs = [];
+        let fullText = '';
+        
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let recordingParagraphId = null;
+        let batchImportAfterId = null;
+        
+        // 添加请求锁定机制，确保每次只有一个API请求在处理
+        let isProcessing = false;
+        let pendingRequests = [];
+        
+        // 处理请求的函数，确保顺序执行
+        function processRequest(requestFn) {
+            return new Promise((resolve, reject) => {
+                if (!isProcessing) {
+                    // 如果当前没有请求在处理，立即执行
+                    isProcessing = true;
+                    requestFn()
+                        .then(resolve)
+                        .catch(reject)
+                        .finally(() => {
+                            isProcessing = false;
+                            // 处理下一个请求
+                            if (pendingRequests.length > 0) {
+                                const nextRequest = pendingRequests.shift();
+                                processRequest(nextRequest.requestFn)
+                                    .then(nextRequest.resolve)
+                                    .catch(nextRequest.reject);
+                            }
+                        });
+                } else {
+                    // 如果当前有请求在处理，将请求加入队列
+                    pendingRequests.push({ requestFn, resolve, reject });
+                }
+            });
+        }
+        
+        // 页面加载时获取章节内容
+        document.addEventListener('DOMContentLoaded', function() {
+            // 从URL获取参数
+            const urlParams = new URLSearchParams(window.location.search);
+            const paramBookId = urlParams.get('book_id');
+            const paramChapterId = urlParams.get('chapter_id');
+            
+            if (paramBookId) bookId = paramBookId;
+            if (paramChapterId) chapterId = paramChapterId;
+            
+            loadParagraphs();
+        });
+        
+        // 显示状态提示
+        function showStatus(message, isSuccess = true) {
+            const statusElement = document.getElementById('status-message');
+            if (statusElement) {
+                statusElement.textContent = message;
+                statusElement.className = `status-message status-${isSuccess ? 'success' : 'error'}`;
+                statusElement.style.display = 'block';
+                
+                // 3秒后自动隐藏
+                setTimeout(() => {
+                    statusElement.style.display = 'none';
+                }, 3000);
+            }
+        }
+        
+        // 更新录音状态
+        function updateRecordingStatus(paragraphId, status) {
+            const statusElement = document.getElementById(`recording-status-${paragraphId}`);
+            if (statusElement) {
+                statusElement.textContent = status;
+            }
+        }
+        
+        // 批量导入相关函数
+        function openBatchImportModal(paragraphId) {
+            batchImportAfterId = paragraphId;
+            const modal = document.getElementById('batch-import-modal');
+            // 移除内联样式的display: none，确保CSS类的样式能生效
+            modal.style.display = 'flex';
+            modal.classList.add('show');
+        }
+        
+        function closeBatchImportModal() {
+            const modal = document.getElementById('batch-import-modal');
+            modal.classList.remove('show');
+            // 使用内联样式隐藏模态框
+            modal.style.display = 'none';
+            document.getElementById('batch-text').value = '';
+            batchImportAfterId = null;
+        }
+        
+        function batchImportParagraphs() {
+            if (!batchImportAfterId) {
+                closeBatchImportModal();
+                return;
+            }
+            
+            const text = document.getElementById('batch-text').value;
+            if (!text.trim()) {
+                closeBatchImportModal();
+                return;
+            }
+            
+            // 按换行符分割文本，过滤空行
+            const newParagraphs = text.split(/\r?\n/).filter(line => line.trim() !== '');
+            
+            if (newParagraphs.length === 0) {
+                closeBatchImportModal();
+                return;
+            }
+            
+            // 批量添加段落
+            batchAddParagraphs(newParagraphs, batchImportAfterId);
+            
+            closeBatchImportModal();
+        }
+        
+        function batchAddParagraphs(paragraphTexts, afterId) {
+            // 递归添加段落，确保顺序正确
+            if (paragraphTexts.length === 0) {
+                // 所有段落添加完成，更新UI
+                renderParagraphs();
+                updatePreview();
+                return;
+            }
+            
+            const text = paragraphTexts.shift();
+            
+            // 使用processRequest确保请求顺序执行
+            processRequest(() => {
+                return fetch(`/api/chapter/${bookId}/${chapterId}/paragraph/add`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        text: text, 
+                        after_id: afterId 
+                    })
+                })
+                .then(response => response.json())
+            })
+            .then(data => {
+                if (data.success) {
+                    // 更新本地数据
+                    paragraphs = data.paragraphs;
+                    fullText = data.full_text;
+                    
+                    // 查找刚刚添加的段落（应该是afterId之后的第一个段落）
+                    let newAfterId = afterId;
+                    const afterIndex = paragraphs.findIndex(p => p.id === afterId);
+                    if (afterIndex !== -1 && afterIndex < paragraphs.length - 1) {
+                        // 新添加的段落应该在afterId之后
+                        newAfterId = paragraphs[afterIndex + 1].id;
+                    } else if (paragraphs.length > 0) {
+                        // 如果afterId不存在或已经是最后一个，新添加的段落应该是最后一个
+                        newAfterId = paragraphs[paragraphs.length - 1].id;
+                    }
+                    
+                    // 继续添加下一个段落
+                    batchAddParagraphs(paragraphTexts, newAfterId);
+                } else {
+                    // 添加失败，停止递归
+                    renderParagraphs();
+                    updatePreview();
+                }
+            })
+            .catch(error => {
+                console.error('Error adding paragraphs:', error);
+                // 发生错误，停止递归并更新UI
+                renderParagraphs();
+                updatePreview();
+            });
+        }
+        
+        function loadParagraphs() {
+            // 使用processRequest确保请求顺序执行
+            processRequest(() => {
+                return fetch(`/api/chapter/${bookId}/${chapterId}/paragraphs`)
+                    .then(response => response.json())
+            })
+            .then(data => {
+                if (data.success) {
+                    paragraphs = data.paragraphs;
+                    fullText = data.full_text;
+                    renderParagraphs();
+                    updatePreview();
+                } else {
+                    showStatus('加载段落失败', false);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading paragraphs:', error);
+                showStatus('加载段落时发生错误', false);
+            });
+        }
+        
+        function renderParagraphs() {
+            const container = document.getElementById('paragraphs-list');
+            // 过滤掉结尾段落块，只渲染普通段落
+            const regularParagraphs = paragraphs.filter(p => !p.is_end_paragraph);
+            container.innerHTML = regularParagraphs.map((paragraph, index) => `
+                <div class="paragraph">
+                    <div class="paragraph-header">
+                        <div class="paragraph-number">段落 ${index + 1}</div>
+                        <div class="paragraph-actions">
+                            ${index > 0 ? `<button class="btn btn-secondary" onclick="moveParagraph('${paragraph.id}', 'up')">↑</button>` : ''}
+                            ${index < regularParagraphs.length - 1 ? `<button class="btn btn-secondary" onclick="moveParagraph('${paragraph.id}', 'down')">↓</button>` : ''}
+                            <button class="btn btn-danger" onclick="deleteParagraph('${paragraph.id}')">删除</button>
+                            <button class="btn btn-secondary" onclick="openBatchImportModal('${paragraph.id}')">批量导入</button>
+                        </div>
+                    </div>
+                    <div class="paragraph-content">
+                        <textarea class="paragraph-text" id="text-${paragraph.id}" placeholder="请输入段落内容..." oninput="saveParagraph('${paragraph.id}')" onkeydown="handleKeyDown(event, '${paragraph.id}')">${paragraph.text}</textarea>
+                    </div>
+                    <div class="recording-controls">
+                        <!-- 根据录音状态和是否有录音文件显示不同的按钮 -->
+                        ${recordingParagraphId === paragraph.id ? `
+                            <button class="btn btn-danger" onclick="stopRecording()">结束录音</button>
+                            <span id="recording-status-${paragraph.id}" class="recording-status">录音中...</span>
+                        ` : `
+                            <button class="btn ${paragraph.audio ? 'btn-success' : 'btn-primary'}" onclick="${paragraph.audio ? `playAudio('${paragraph.id}', '${paragraph.audio}')` : `startRecording('${paragraph.id}')`}">
+                                ${paragraph.audio ? '播放录音' : '开始录音'}
+                            </button>
+                            ${paragraph.audio ? `<button class="btn btn-secondary" onclick="deleteAudio('${paragraph.id}')">删除录音</button>` : ''}
+                            <span id="recording-status-${paragraph.id}" class="recording-status"></span>
+                        `}
+                    </div>
+                    ${paragraph.audio ? `<div class="audio-info">已有录音文件</div>` : ''}
+                </div>
+            `).join('');
+        }
+        
+        function updatePreview() {
+            const preview = document.getElementById('preview-content');
+            if (fullText) {
+                // 按换行符分割文本，过滤空行
+                const paragraphs = fullText.split('\n').filter(p => p.trim() !== '');
+                if (paragraphs.length > 0) {
+                    preview.innerHTML = paragraphs.map(p => `<p>${p}</p>`).join('');
+                } else {
+                    preview.innerHTML = '<p>开始编辑，这里将实时显示所有段落内容...</p>';
+                }
+            } else {
+                preview.innerHTML = '<p>开始编辑，这里将实时显示所有段落内容...</p>';
+            }
+        }
+        
+        function saveParagraph(paragraphId) {
+            const textarea = document.getElementById(`text-${paragraphId}`);
+            const text = textarea.value;
+            
+            // 使用processRequest确保请求顺序执行
+            processRequest(() => {
+                return fetch(`/api/chapter/${bookId}/${chapterId}/paragraph/update`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id: paragraphId, text: text })
+                })
+                .then(response => response.json())
+            })
+            .then(data => {
+                if (data.success) {
+                    // 更新本地数据
+                    const paragraph = paragraphs.find(p => p.id === paragraphId);
+                    if (paragraph) {
+                        paragraph.text = text;
+                    }
+                    // 更新全文
+                    fullText = data.full_text;
+                    updatePreview();
+                }
+            })
+            .catch(error => {
+                console.error('Error saving paragraph:', error);
+            });
+        }
+        
+        function addParagraph(text = '', afterId = null) {
+            // 保存当前段落列表，用于比较找出新添加的段落
+            const oldParagraphs = [...paragraphs];
+            
+            // 使用processRequest确保请求顺序执行
+            processRequest(() => {
+                return fetch(`/api/chapter/${bookId}/${chapterId}/paragraph/add`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        text: text, 
+                        after_id: afterId 
+                    })
+                })
+                .then(response => response.json())
+            })
+            .then(data => {
+                if (data.success) {
+                    // 更新所有段落和全文
+                    paragraphs = data.paragraphs;
+                    fullText = data.full_text;
+                    renderParagraphs();
+                    updatePreview();
+                    
+                    // 找出新添加的段落
+                    const newParagraphs = paragraphs.filter(p => !oldParagraphs.some(op => op.id === p.id));
+                    if (newParagraphs.length > 0) {
+                        // 聚焦到新添加的段落
+                        const newParagraph = newParagraphs[0];
+                        setTimeout(() => {
+                            const textarea = document.getElementById(`text-${newParagraph.id}`);
+                            if (textarea) {
+                                textarea.focus();
+                            }
+                        }, 100);
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error adding paragraph:', error);
+                showStatus('添加段落失败', false);
+            });
+        }
+        
+        function deleteParagraph(paragraphId) {
+            fetch(`/api/chapter/${bookId}/${chapterId}/paragraph/delete/${paragraphId}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 更新本地数据
+                    paragraphs = paragraphs.filter(p => p.id !== paragraphId);
+                    // 更新全文
+                    fullText = data.full_text;
+                    renderParagraphs();
+                    updatePreview();
+                    showStatus('段落删除成功');
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting paragraph:', error);
+            });
+        }
+        
+        function moveParagraph(paragraphId, direction) {
+            fetch(`/api/chapter/${bookId}/${chapterId}/paragraph/move/${paragraphId}/${direction}`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    paragraphs = data.paragraphs;
+                    fullText = data.full_text;
+                    renderParagraphs();
+                    updatePreview();
+                }
+            })
+            .catch(error => {
+                console.error('Error moving paragraph:', error);
+            });
+        }
+        
+        function handleKeyDown(event, paragraphId) {
+            // Enter 键新建段落
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                
+                // 获取当前文本框内容
+                const textarea = document.getElementById(`text-${paragraphId}`);
+                const text = textarea.value;
+                
+                // 保存当前段落
+                saveParagraph(paragraphId);
+                
+                // 在当前段落之后添加新段落
+                addParagraph('', paragraphId);
+            }
+            // Shift+Enter 在当前文本框内换行
+            else if (event.key === 'Enter' && event.shiftKey) {
+                // 允许默认行为
+            }
+        }
+        
+        function startRecording(paragraphId) {
+            // 停止之前的录音
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                stopRecording();
+                return;
+            }
+            
+            recordingParagraphId = paragraphId;
+            
+            // 更新UI
+            renderParagraphs();
+            
+            // 开始录音
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    // 确保重置录音状态
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+                    
+                    mediaRecorder.ondataavailable = event => {
+                        if (event.data.size > 0) {
+                            audioChunks.push(event.data);
+                        }
+                    };
+                    
+                    mediaRecorder.onstop = () => {
+                        // 使用当前的recordingParagraphId
+                        const currentId = recordingParagraphId;
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        
+                        // 停止所有音轨
+                        stream.getTracks().forEach(track => track.stop());
+                        
+                        // 重置状态
+                        mediaRecorder = null;
+                        audioChunks = [];
+                        
+                        // 上传录音
+                        if (currentId) {
+                            uploadAudio(currentId, audioBlob);
+                        }
+                    };
+                    
+                    mediaRecorder.start();
+                })
+                .catch(error => {
+                    console.error('Error accessing microphone:', error);
+                    // 重置状态
+                    mediaRecorder = null;
+                    audioChunks = [];
+                    recordingParagraphId = null;
+                    renderParagraphs();
+                });
+        }
+        
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+            }
+            // 注意：不要在这里重置recordingParagraphId，因为onstop事件会处理上传和状态重置
+        }
+        
+        function uploadAudio(paragraphId, audioBlob) {
+            // 使用processRequest确保请求顺序执行
+            processRequest(() => {
+                const formData = new FormData();
+                formData.append('audio', audioBlob, 'recording.wav');
+                
+                return fetch(`/api/chapter/${bookId}/${chapterId}/audio/upload/${paragraphId}`, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+            })
+            .then(data => {
+                if (data.success) {
+                    // 更新本地数据
+                    const paragraph = paragraphs.find(p => p.id === paragraphId);
+                    if (paragraph) {
+                        paragraph.audio = data.paragraph.audio;
+                    }
+                }
+                // 无论成功失败，都重置状态
+                recordingParagraphId = null;
+                renderParagraphs();
+            })
+            .catch(error => {
+                console.error('Error uploading audio:', error);
+                // 重置状态
+                recordingParagraphId = null;
+                renderParagraphs();
+            });
+        }
+        
+        function playAudio(paragraphId, audioFilename) {
+            const audioUrl = `/api/audio/${bookId}/${chapterId}/${audioFilename}`;
+            const audio = new Audio(audioUrl);
+            audio.play();
+        }
+        
+        function deleteAudio(paragraphId) {
+            // 调用API删除录音文件
+            fetch(`/api/chapter/${bookId}/${chapterId}/audio/delete/${paragraphId}`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 更新本地数据
+                    const paragraph = paragraphs.find(p => p.id === paragraphId);
+                    if (paragraph) {
+                        paragraph.audio = '';
+                    }
+                    renderParagraphs();
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting audio:', error);
+            });
+        }
+        
+        function copyToClipboard() {
+            const preview = document.getElementById('preview-content');
+            const text = preview.textContent;
+            
+            navigator.clipboard.writeText(text)
+                .then(() => {
+                    const copyBtn = document.querySelector('.copy-btn');
+                    const originalText = copyBtn.textContent;
+                    copyBtn.textContent = '已复制！';
+                    copyBtn.classList.add('copied');
+                    
+                    setTimeout(() => {
+                        copyBtn.textContent = originalText;
+                        copyBtn.classList.remove('copied');
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('复制失败:', err);
+                    showStatus('复制失败，请手动复制', false);
+                });
+        }
+    </script>
+</body>
+</html>

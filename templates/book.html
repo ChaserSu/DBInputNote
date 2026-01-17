@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>章节管理 - 如我所述 如我所书</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        header {
+            background-color: #4a90e2;
+            color: white;
+            padding: 15px 0;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-content h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .header-content .back-btn {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .header-content .back-btn:hover {
+            background-color: rgba(255,255,255,0.3);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .book-header {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .book-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .book-author {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .chapters-header {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chapters-header h2 {
+            font-size: 20px;
+            color: #333;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background-color: #4a90e2;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #357abd;
+        }
+        
+        .btn-secondary {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #d0d0d0;
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .chapters-list {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .chapter-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+        
+        .chapter-item:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .chapter-item:last-child {
+            border-bottom: none;
+        }
+        
+        .chapter-info {
+            flex: 1;
+        }
+        
+        .chapter-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .chapter-meta {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .chapter-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .empty-state h3 {
+            color: #999;
+            margin-bottom: 10px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s ease;
+        }
+        
+        .modal-header {
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h3 {
+            font-size: 20px;
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .status-message {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="/" class="back-btn">← 返回书架</a>
+            <h1>章节管理 - 如我所述 如我所书</h1>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div id="status-message" class="status-message" style="display: none;"></div>
+        
+        <div id="book-header" class="book-header"></div>
+        
+        <div class="chapters-header">
+            <h2>章节列表</h2>
+            <button class="btn btn-primary" onclick="openNewChapterModal()">新建章节</button>
+        </div>
+        
+        <div id="empty-state" class="empty-state" style="display: none;">
+            <h3>暂无章节</h3>
+            <p>点击上方按钮开始创建你的第一章</p>
+        </div>
+        
+        <div id="chapters-list" class="chapters-list"></div>
+    </div>
+    
+    <!-- 新建章节模态框 -->
+    <div id="new-chapter-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>新建章节</h3>
+            </div>
+            <form id="new-chapter-form">
+                <div class="form-group">
+                    <label for="chapter-title">章节标题</label>
+                    <input type="text" id="chapter-title" name="title" placeholder="请输入章节标题" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeNewChapterModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">创建</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 编辑章节模态框 -->
+    <div id="edit-chapter-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>编辑章节  - 如我所述 如我所书 </h3>
+            </div>
+            <form id="edit-chapter-form">
+                <input type="hidden" id="edit-chapter-id">
+                <div class="form-group">
+                    <label for="edit-chapter-title">章节标题</label>
+                    <input type="text" id="edit-chapter-title" name="title" placeholder="请输入章节标题" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditChapterModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        let bookId = '{{ book_id }}';
+        let book = null;
+        let chapters = [];
+        
+        // 页面加载时获取书籍信息
+        document.addEventListener('DOMContentLoaded', function() {
+            // 从URL获取bookId
+            const urlParams = new URLSearchParams(window.location.search);
+            const paramBookId = urlParams.get('book_id');
+            if (paramBookId) {
+                bookId = paramBookId;
+            }
+            
+            loadBookInfo();
+        });
+        
+        function showStatus(message, isSuccess = true) {
+            const statusDiv = document.getElementById('status-message');
+            statusDiv.textContent = message;
+            statusDiv.className = `status-message status-${isSuccess ? 'success' : 'error'}`;
+            statusDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 3000);
+        }
+        
+        function loadBookInfo() {
+            fetch(`/api/book/${bookId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        book = data.book;
+                        chapters = book.chapters;
+                        renderBookInfo();
+                        renderChapters();
+                    } else {
+                        showStatus('加载书籍失败', false);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading book:', error);
+                    showStatus('加载书籍时发生错误', false);
+                });
+        }
+        
+        function renderBookInfo() {
+            const header = document.getElementById('book-header');
+            header.innerHTML = `
+                <div class="book-title">${book.title}</div>
+                <div class="book-author">作者: ${book.author || '未知作者'}</div>
+            `;
+        }
+        
+        function renderChapters() {
+            const list = document.getElementById('chapters-list');
+            const emptyState = document.getElementById('empty-state');
+            
+            if (chapters.length === 0) {
+                emptyState.style.display = 'block';
+                list.style.display = 'none';
+            } else {
+                emptyState.style.display = 'none';
+                list.style.display = 'block';
+                
+                list.innerHTML = chapters.map((chapter, index) => `
+                    <div class="chapter-item">
+                        <div class="chapter-info">
+                            <div class="chapter-title">第${index + 1}章: ${chapter.title}</div>
+                            <div class="chapter-meta">创建于: ${new Date(chapter.created_at).toLocaleDateString()}</div>
+                        </div>
+                        <div class="chapter-actions">
+                            <button class="btn btn-secondary" onclick="editChapter('${chapter.id}', '${chapter.title}')">编辑</button>
+                            <button class="btn btn-danger" onclick="deleteChapter('${chapter.id}')">删除</button>
+                            <button class="btn btn-primary" onclick="openEditor('${chapter.id}')">进入编辑</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        function openEditor(chapterId) {
+            window.location.href = `/editor/${bookId}/${chapterId}`;
+        }
+        
+        function openNewChapterModal() {
+            document.getElementById('new-chapter-modal').classList.add('show');
+        }
+        
+        function closeNewChapterModal() {
+            document.getElementById('new-chapter-modal').classList.remove('show');
+            document.getElementById('new-chapter-form').reset();
+        }
+        
+        function openEditChapterModal() {
+            document.getElementById('edit-chapter-modal').classList.add('show');
+        }
+        
+        function closeEditChapterModal() {
+            document.getElementById('edit-chapter-modal').classList.remove('show');
+            document.getElementById('edit-chapter-form').reset();
+        }
+        
+        // 点击模态框外部关闭
+        window.onclick = function(event) {
+            const modals = ['new-chapter-modal', 'edit-chapter-modal'];
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (event.target === modal) {
+                    modal.classList.remove('show');
+                }
+            });
+        }
+        
+        // 新建章节表单提交
+        document.getElementById('new-chapter-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('chapter-title').value;
+            
+            fetch(`/api/book/${bookId}/chapter/new`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ title })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showStatus('章节创建成功');
+                    closeNewChapterModal();
+                    loadBookInfo();
+                } else {
+                    showStatus('章节创建失败', false);
+                }
+            })
+            .catch(error => {
+                console.error('Error creating chapter:', error);
+                showStatus('创建章节时发生错误', false);
+            });
+        });
+        
+        function editChapter(chapterId, currentTitle) {
+            document.getElementById('edit-chapter-id').value = chapterId;
+            document.getElementById('edit-chapter-title').value = currentTitle;
+            openEditChapterModal();
+        }
+        
+        // 编辑章节表单提交
+        document.getElementById('edit-chapter-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const chapterId = document.getElementById('edit-chapter-id').value;
+            const title = document.getElementById('edit-chapter-title').value;
+            
+            fetch(`/api/book/${bookId}/chapter/${chapterId}/update`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ title })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showStatus('章节更新成功');
+                    closeEditChapterModal();
+                    loadBookInfo();
+                } else {
+                    showStatus('章节更新失败', false);
+                }
+            })
+            .catch(error => {
+                console.error('Error updating chapter:', error);
+                showStatus('更新章节时发生错误', false);
+            });
+        });
+        
+        function deleteChapter(chapterId) {
+            fetch(`/api/book/${bookId}/chapter/${chapterId}/delete`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showStatus('章节删除成功');
+                    loadBookInfo();
+                } else {
+                    showStatus('章节删除失败', false);
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting chapter:', error);
+                showStatus('删除章节时发生错误', false);
+            });
+        }
+    </script>
+</body>
+</html>

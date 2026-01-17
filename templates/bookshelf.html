@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DBInputNote - 如我所述 如我所书</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        header {
+            background-color: #4a90e2;
+            color: white;
+            padding: 15px 0;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header-content h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .bookshelf-header {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .bookshelf-header h2 {
+            font-size: 20px;
+            color: #333;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background-color: #4a90e2;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #357abd;
+        }
+        
+        .btn-secondary {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #d0d0d0;
+        }
+        
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .book-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .book-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+        
+        .book-cover {
+            height: 180px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+            position: relative;
+        }
+        
+        .delete-book-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: rgba(231, 76, 60, 0.8);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .delete-book-btn:hover {
+            background-color: rgba(231, 76, 60, 1);
+            transform: scale(1.1);
+        }
+        
+        .book-info {
+            padding: 15px;
+        }
+        
+        .book-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .book-author {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .book-stats {
+            font-size: 12px;
+            color: #999;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .book-card {
+            position: relative;
+        }
+        
+        .book-card-content {
+            cursor: pointer;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .empty-state h3 {
+            color: #999;
+            margin-bottom: 10px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s ease;
+        }
+        
+        .modal-header {
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h3 {
+            font-size: 20px;
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .status-message {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>DBInputNote - 如我所述 如我所书</h1>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div id="status-message" class="status-message" style="display: none;"></div>
+        
+        <div class="bookshelf-header">
+            <h2>我的书籍</h2>
+            <button class="btn btn-primary" onclick="openNewBookModal()">新建书籍</button>
+        </div>
+        
+        <div id="empty-state" class="empty-state" style="display: none;">
+            <h3>书架为空</h3>
+            <p>点击上方按钮开始创建你的第一本书籍</p>
+        </div>
+        
+        <div id="books-grid" class="books-grid"></div>
+    </div>
+    
+    <!-- 新建书籍模态框 -->
+    <div id="new-book-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>新建书籍</h3>
+            </div>
+            <form id="new-book-form">
+                <div class="form-group">
+                    <label for="book-title">书名</label>
+                    <input type="text" id="book-title" name="title" placeholder="请输入书名" required>
+                </div>
+                <div class="form-group">
+                    <label for="book-author">作者</label>
+                    <input type="text" id="book-author" name="author" placeholder="请输入作者名">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeNewBookModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">创建</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        let books = [];
+        
+        // 页面加载时获取书籍列表
+        document.addEventListener('DOMContentLoaded', function() {
+            loadBooks();
+        });
+        
+        function showStatus(message, isSuccess = true) {
+            const statusDiv = document.getElementById('status-message');
+            statusDiv.textContent = message;
+            statusDiv.className = `status-message status-${isSuccess ? 'success' : 'error'}`;
+            statusDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 3000);
+        }
+        
+        function loadBooks() {
+            fetch('/api/books')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        books = data.books;
+                        renderBooks();
+                    } else {
+                        showStatus('加载书籍失败', false);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading books:', error);
+                    showStatus('加载书籍时发生错误', false);
+                });
+        }
+        
+        function renderBooks() {
+            const grid = document.getElementById('books-grid');
+            const emptyState = document.getElementById('empty-state');
+            
+            if (books.length === 0) {
+                emptyState.style.display = 'block';
+                grid.style.display = 'none';
+            } else {
+                emptyState.style.display = 'none';
+                grid.style.display = 'grid';
+                
+                grid.innerHTML = books.map(book => `
+                    <div class="book-card">
+                        <div class="book-card-content" onclick="openBook('${book.id}')">
+                            <div class="book-cover">
+                                📚
+                                <button class="delete-book-btn" onclick="event.stopPropagation(); deleteBook('${book.id}')">×</button>
+                            </div>
+                            <div class="book-info">
+                                <div class="book-title">${book.title}</div>
+                                <div class="book-author">${book.author || '未知作者'}</div>
+                                <div class="book-stats">
+                                    <span>${book.chapters.length || 0} 章节</span>
+                                    <span>${new Date(book.chapters[0]?.created_at || Date.now()).toLocaleDateString()}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        function openBook(bookId) {
+            window.location.href = `/book/${bookId}`;
+        }
+        
+        function deleteBook(bookId) {
+            fetch(`/api/book/${bookId}/delete`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showStatus('书籍删除成功');
+                    loadBooks();
+                } else {
+                    showStatus('书籍删除失败: ' + (data.message || '未知错误'), false);
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting book:', error);
+                showStatus('删除书籍时发生错误', false);
+            });
+        }
+        
+        function openNewBookModal() {
+            document.getElementById('new-book-modal').classList.add('show');
+        }
+        
+        function closeNewBookModal() {
+            document.getElementById('new-book-modal').classList.remove('show');
+            document.getElementById('new-book-form').reset();
+        }
+        
+        // 点击模态框外部关闭
+        window.onclick = function(event) {
+            const modal = document.getElementById('new-book-modal');
+            if (event.target === modal) {
+                closeNewBookModal();
+            }
+        }
+        
+        // 新建书籍表单提交
+        document.getElementById('new-book-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('book-title').value;
+            const author = document.getElementById('book-author').value;
+            
+            fetch('/api/book/new', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ title, author })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showStatus('书籍创建成功');
+                    closeNewBookModal();
+                    loadBooks();
+                } else {
+                    showStatus('书籍创建失败', false);
+                }
+            })
+            .catch(error => {
+                console.error('Error creating book:', error);
+                showStatus('创建书籍时发生错误', false);
+            });
+        });
+    </script>
+</body>
+</html>
