@@ -17,17 +17,14 @@
 画师和AI绘画"炼丹师"之间的冲突已是前车之鉴，结合AI绘画对漫画、动画和插画产业造成的实际冲击，以及AI漫剧的爆火，我并不怀疑AI网文在商业层面的前景。我所做的选择，也并非技术立场之争，而只是基于个人的职业理念，我仍然更愿意以人的方式，去讲述一个故事。
 
 
-
-
-
 # 编辑页面
-<img width="686" height="514" alt="image" src="https://github.com/user-attachments/assets/c3c69890-40d4-4077-b7a8-ad9b76c7ffcd" />
+<img width="343" height="257" alt="image" src="https://github.com/user-attachments/assets/c3c69890-40d4-4077-b7a8-ad9b76c7ffcd" />
 
 # 章节管理页面
-<img width="686" height="514" alt="image" src="https://github.com/user-attachments/assets/9c32ecbf-3c9d-4d88-8469-ba6975e3ccfd" />
+<img width="343" height="257" alt="image" src="https://github.com/user-attachments/assets/9c32ecbf-3c9d-4d88-8469-ba6975e3ccfd" />
 
 # 首页
-<img width="686" height="514" alt="image" src="https://github.com/user-attachments/assets/240745a3-941c-440c-89ff-27bb701893e1" />
+<img width="343" height="257" alt="image" src="https://github.com/user-attachments/assets/240745a3-941c-440c-89ff-27bb701893e1" />
 
 
 这是一个flask的应用，启动后你可以在同局域网下的其他设备访问，或将其移植到全平台
@@ -37,13 +34,21 @@
 
 ## 早岁已知世事艰，仍许飞鸿荡云间
 > “方源仙友，这下可如何收场? "沈伤急问。
+> 
 > “没有乐土大人，如何抗衡双尊? ! "陆畏因跺脚，瞪着方源。
+> 
 > 方源淡笑一声:“很简单，我成尊不就是了?”
+> 
 > 说完，他气息终于不再掩饰，显露而出。
+> 
 > 九转修为!
+> 
 > 一瞬间，战场再次一寂。
+> 
 > 方源一身雪袍，青丝飘扬，纵横战场，气盖山河。
+> 
 > 他牢牢占据上风，口中忽吟道——
+> 
 > 早岁已知世事艰，
 > 仍许飞鸿荡云间。
 > 一路寒风身如絮，
