@@ -584,15 +584,18 @@ def delete_audio(book_id, chapter_id, paragraph_id):
 
 if __name__ == '__main__':
     # 配置参数
-    CURRENT_VERSION = "0.0.1"
+    CURRENT_VERSION = "0.0.2"
     GITHUB_REPO = "ChaserSu/DBInputNote"  # GitHub 用户名/仓库名
     port = 5001
     
     print("正在启动DBInputNote...")
     
+    # 每次启动都生成新证书，防止IP内网变动
+    from generate_cert import generate_self_signed_cert
+    generate_self_signed_cert()
+    
     # 获取本地IP和访问URL
     local_ip = get_local_ip()
-    http_url = f"http://{local_ip}:{port}"
     https_url = f"https://{local_ip}:{port}"
     
     # 生成并输出终端二维码（使用HTTPS）
@@ -632,8 +635,7 @@ if __name__ == '__main__':
     
     # 输出启动信息
     print(f"\n服务器已启动！")
-    print(f"HTTPS访问地址（推荐，用于录音功能）：{https_url}")
-    print(f"HTTP访问地址（备用）：{http_url}")
+    print(f"HTTPS访问地址：{https_url}")
     print(f"注意，跨设备访问需在同一局域网下")
     print(f"当前版本 v{CURRENT_VERSION}，项目地址：https://github.com/{GITHUB_REPO}")
     print(f"首次访问HTTPS会提示证书不安全，点击'高级'->'继续访问'即可")
@@ -642,34 +644,21 @@ if __name__ == '__main__':
     # 使用自签名证书支持HTTPS
     import ssl
     
-    # 简单的HTTPS配置，使用现有证书或生成简单证书
+    # 使用新生成的证书文件
     cert_file = 'localhost.crt'
     key_file = 'localhost.key'
     
-    # 检查证书文件是否存在
-    if os.path.exists(cert_file) and os.path.exists(key_file):
-        print(f"使用现有证书文件：{cert_file} 和 {key_file}")
-        try:
-            # 使用现有证书
-            ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
-            ssl_context.load_cert_chain(cert_file, key_file)
-            # 启动HTTPS服务器
-            print(f"正在启动HTTPS服务器...")
-            app.run(debug=False, host='0.0.0.0', port=port, ssl_context=ssl_context)
-        except Exception as e:
-            print(f"HTTPS启动失败：{str(e)}")
-            print("正在尝试启动HTTP服务器...")
-            # 回退到HTTP
-            app.run(debug=False, host='0.0.0.0', port=port)
-    else:
-        print(f"证书文件不存在，使用简单的自签名证书生成")
-        try:
-            # 使用ssl.wrap_socket生成简单的自签名证书
-            # 这种方法会自动生成临时证书
-            print(f"正在启动HTTPS服务器（自动生成证书）...")
-            app.run(debug=False, host='0.0.0.0', port=port, ssl_context='adhoc')
-        except Exception as e:
-            print(f"HTTPS启动失败：{str(e)}")
-            print("正在尝试启动HTTP服务器...")
-            # 回退到HTTP
-            app.run(debug=False, host='0.0.0.0', port=port)
+    # 直接使用新生成的证书，无需检查存在性，因为我们已经生成了
+    print(f"使用新生成的证书文件：{cert_file} 和 {key_file}")
+    try:
+        # 使用新生成的证书
+        ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+        ssl_context.load_cert_chain(cert_file, key_file)
+        # 启动HTTPS服务器
+        print(f"正在启动HTTPS服务器...")
+        app.run(debug=False, host='0.0.0.0', port=port, ssl_context=ssl_context)
+    except Exception as e:
+        print(f"HTTPS启动失败：{str(e)}")
+        print("正在尝试启动HTTP服务器...")
+        # 回退到HTTP
+        app.run(debug=False, host='0.0.0.0', port=port)
