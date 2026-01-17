@@ -18,18 +18,18 @@
 
 
 # 编辑页面
-<img width="1372" height="1029" alt="image" src="https://github.com/user-attachments/assets/c3c69890-40d4-4077-b7a8-ad9b76c7ffcd" />
+<img width="137" height="102" alt="image" src="https://github.com/user-attachments/assets/c3c69890-40d4-4077-b7a8-ad9b76c7ffcd" />
 
 # 章节管理页面
-<img width="1372" height="1029" alt="image" src="https://github.com/user-attachments/assets/9c32ecbf-3c9d-4d88-8469-ba6975e3ccfd" />
+<img width="137" height="102" alt="image" src="https://github.com/user-attachments/assets/9c32ecbf-3c9d-4d88-8469-ba6975e3ccfd" />
 
 # 首页
-<img width="1372" height="1029" alt="image" src="https://github.com/user-attachments/assets/240745a3-941c-440c-89ff-27bb701893e1" />
+<img width="137" height="102" alt="image" src="https://github.com/user-attachments/assets/240745a3-941c-440c-89ff-27bb701893e1" />
 
 
 这是一个flask的应用，启动后你可以在同局域网下的其他设备访问，或将其移植到全平台
 
-<img width="762" height="762" alt="image" src="https://github.com/user-attachments/assets/1fd72cf7-f217-4b56-ac6f-bfdbc6bf9bcb" />
+<img width="76" height="76" alt="image" src="https://github.com/user-attachments/assets/1fd72cf7-f217-4b56-ac6f-bfdbc6bf9bcb" />
 
 ## 早岁已知世事艰，仍许飞鸿荡云间
 > “方源仙友，这下可如何收场? "沈伤急问。
