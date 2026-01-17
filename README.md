@@ -18,13 +18,13 @@
 
 
 # 编辑页面
-<img width="343" height="257" alt="image" src="https://github.com/user-attachments/assets/c3c69890-40d4-4077-b7a8-ad9b76c7ffcd" />
+<img width="686" height="514" alt="image" src="https://github.com/user-attachments/assets/c3c69890-40d4-4077-b7a8-ad9b76c7ffcd" />
 
 # 章节管理页面
-<img width="343" height="257" alt="image" src="https://github.com/user-attachments/assets/9c32ecbf-3c9d-4d88-8469-ba6975e3ccfd" />
+<img width="686" height="514" alt="image" src="https://github.com/user-attachments/assets/9c32ecbf-3c9d-4d88-8469-ba6975e3ccfd" />
 
 # 首页
-<img width="343" height="257" alt="image" src="https://github.com/user-attachments/assets/240745a3-941c-440c-89ff-27bb701893e1" />
+<img width="686" height="514" alt="image" src="https://github.com/user-attachments/assets/240745a3-941c-440c-89ff-27bb701893e1" />
 
 
 这是一个flask的应用，启动后你可以在同局域网下的其他设备访问，或将其移植到全平台
