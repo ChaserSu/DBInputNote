@@ -1,67 +1,149 @@
-【这是一个超早期的demo，请勿用于生产环境】
-# DBInputNote ——— 如我所述 如我所书
-人人有模型练，人人有故事写，在写作初期就将作品本身作为一个智能体来培养
+# DBInputNote —— 如我所述 如我所书
 
-一个用来写网文的文本编辑器，在创作阶段就以分段录入的形式准备语音训练的标注数据，（即将）支持语音识别，（即将）支持闲时语音模型自训练，为每一本书准备一个最合适的模型
+[![GitHub Stars](https://img.shields.io/github/stars/ChaserSu/DBInputNote?style=social)](https://github.com/ChaserSu/DBInputNote)
+[![GitHub Forks](https://img.shields.io/github/forks/ChaserSu/DBInputNote?style=social)](https://github.com/ChaserSu/DBInputNote)
 
-开发目标是在16GB显存的设备上实现用作者自己的语音数据和文本标注数据来进行模型自训练，前后端分离的设计，能够在作者自己的台式机，服务器，云服务器集群，家用NAS设备或者一切能联网的计算平台上长期运行，然后可以在任意设备上，例如手机平板，甚至是各种奇怪的Linux硬件，一切有屏幕和键盘的设备上码字，并获得一致的体验
+> 【这是一个超早期的demo，请勿用于生产环境】
 
+## 📖 项目简介
 
-> AI写作比你慢慢写快多了
+人人有模型练，人人有故事写，在写作初期就将作品本身作为一个智能体来培养。
 
-确实如此。AI生成网文的效率和质量有目共睹，网文这两年才会如此内卷。很长一段时间里，网文圈对语音输入是相当排斥的，编辑往往会明确标注：除非是已有成绩的作者，否则不接收语音稿。但在AI文大量涌入之后，现实已经发生了变化。许多纯人力作者也开始系统性地引入各种工具，包括辅助码、语法模型、语音识别与纠错模型等，只为在不被淘汰的前提下，尽可能提高产出效率。
+DBInputNote是一款专为网文作者设计的文本编辑器，在创作阶段就以分段录入的形式准备语音训练的标注数据，支持语音识别（即将上线）和闲时语音模型自训练（即将上线），为每一本书准备一个最合适的语音模型。
 
-不过，出于一个网文作者朴素的情感，以及长期形成的创作路径依赖，我个人仍然更倾向于"人力+语音"的传统创作方式，而对直接使用AI生成网文持保留态度。原因并不在于否认AI的能力或前景，而在于，如果创作本身高度依赖AI生成，对个人创作者而言几乎等同于切断了自身水平成长的路径。
+## ✨ 核心功能
 
-从文化与文学创作的产业链上游，故事与灵感的生产者，转变为工业化流水线中的操作人员。而"成长性"和"可能性"，恰恰是很多人选择写网文的根本原因。从这个角度看，传统意义上的人力网文作者，与以AI生成为核心手段的"作者"，不仅仅是工具选择不同，而是创作理念、职业定位乃至自我认同上的根本差异，几乎可以视为两种完全不同的职业。
+- 📝 **分段录入**：以分段形式录入文本，同时生成语音训练标注数据
+- 🎤 **语音识别**：支持语音输入转文本（即将上线）
+- 🤖 **模型自训练**：利用作者自己的语音和文本数据训练专属模型
+- 💻 **跨平台运行**：前后端分离设计，支持在各种硬件上部署
+- 🌐 **多设备访问**：可在手机、平板、PC等任意设备上使用
 
-画师和AI绘画"炼丹师"之间的冲突已是前车之鉴，结合AI绘画对漫画、动画和插画产业造成的实际冲击，以及AI漫剧的爆火，我并不怀疑AI网文在商业层面的前景。我所做的选择，也并非技术立场之争，而只是基于个人的职业理念，我仍然更愿意以人的方式，去讲述一个故事。
+## 🎯 开发目标
 
+- 在16GB显存设备上实现模型自训练
+- 支持作者自己的台式机、服务器、云服务器集群、家用NAS等平台长期运行
+- 提供一致的多设备写作体验
+- 为每本书生成专属语音模型
 
-# 编辑页面
-<img width="686" height="514" alt="image" src="https://github.com/user-attachments/assets/c3c69890-40d4-4077-b7a8-ad9b76c7ffcd" />
+## 🛠️ 技术栈
 
-# 章节管理页面
-<img width="686" height="514" alt="image" src="https://github.com/user-attachments/assets/9c32ecbf-3c9d-4d88-8469-ba6975e3ccfd" />
+### 后端
+- Python
+- Flask
 
-# 首页
-<img width="686" height="514" alt="image" src="https://github.com/user-attachments/assets/240745a3-941c-440c-89ff-27bb701893e1" />
+### 前端
+- Web技术栈（HTML/CSS/JavaScript）
 
+### 核心特性
+- 前后端分离架构
+- 支持跨平台部署
+- 语音数据处理与模型训练
 
-这是一个flask的应用，启动后你可以在同局域网下的其他设备访问，或将其移植到全平台
+## 🚀 快速开始
 
-<img width="381" height="381" alt="image" src="https://github.com/user-attachments/assets/1fd72cf7-f217-4b56-ac6f-bfdbc6bf9bcb" />
+### 环境要求
+- Python 3.7+
+- Flask
+- 其他依赖包（见requirements.txt）
 
+### 启动方式
+#### 从预编译二进制文件启动
+（Windows AMD64推荐）
 
-## 早岁已知世事艰，仍许飞鸿荡云间
-> “方源仙友，这下可如何收场? "沈伤急问。
-> 
-> “没有乐土大人，如何抗衡双尊? ! "陆畏因跺脚，瞪着方源。
-> 
-> 方源淡笑一声:“很简单，我成尊不就是了?”
-> 
-> 说完，他气息终于不再掩饰，显露而出。
-> 
-> 九转修为!
-> 
-> 一瞬间，战场再次一寂。
-> 
-> 方源一身雪袍，青丝飘扬，纵横战场，气盖山河。
-> 
-> 他牢牢占据上风，口中忽吟道——
-> 
-> 早岁已知世事艰，
-> 
-> 仍许飞鸿荡云间。
-> 
-> 一路寒风身如絮，
-> 
-> 命海沉浮客独行。
-> 
-> 千磨万击心铸铁，
-> 
-> 殚精竭虑铸一剑。
-> 
-> 今朝剑指叠云处，
-> 
-> 炼蛊炼人还炼天!
+直接去[Release](https://github.com/ChaserSu/DBInputNote/releases)下载预编译二进制文件。
+
+#### 从源代码启动
+（Windows ARM或其他系统下需要从源代码启动源代码）
+
+1. 克隆仓库
+   ```bash
+   git clone https://github.com/ChaserSu/DBInputNote.git
+   cd DBInputNote
+   ```
+
+2. 安装依赖
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. 启动应用
+   ```bash
+   python app.py
+   ```
+
+4. 在浏览器中访问
+   ```
+   http://localhost:5000
+   ```
+
+5. 同局域网设备可通过IP地址访问（或扫描生成的二维码）
+   ```
+   http://<your-ip>:5000
+   ```
+
+## 📸 界面预览
+
+### 编辑页面
+<img width="686" height="514" alt="编辑页面" src="https://github.com/user-attachments/assets/c3c69890-40d4-4077-b7a8-ad9b76c7ffcd" />
+
+### 章节管理页面
+<img width="686" height="514" alt="章节管理页面" src="https://github.com/user-attachments/assets/9c32ecbf-3c9d-4d88-8469-ba6975e3ccfd" />
+
+### 首页
+<img width="686" height="514" alt="首页" src="https://github.com/user-attachments/assets/240745a3-941c-440c-89ff-27bb701893e1" />
+
+### 多设备访问
+<img width="381" height="381" alt="多设备访问" src="https://github.com/user-attachments/assets/1fd72cf7-f217-4b56-ac6f-bfdbc6bf9bcb" />
+
+## 📊 Coding Analysis
+
+### GitHub Stats
+![GitHub Stats](https://github-readme-stats.vercel.app/api?username=ChaserSu&show_icons=true)
+
+### Top Languages
+![Top Languages](https://github-readme-stats.vercel.app/api/top-langs/?username=ChaserSu&layout=compact&show_icons=true)
+
+## 📝 创作理念
+
+AI写作比传统写作效率更高，但出于网文作者的朴素情感和创作路径依赖，我们更倾向于"人力+语音"的传统创作方式。
+
+在AI文大量涌入的背景下，许多纯人力作者开始引入各种工具提升效率。我们认为，创作本身高度依赖AI生成，可能会切断个人创作者的水平成长路径。
+
+DBInputNote旨在帮助作者在保持人力创作核心的同时，利用AI技术提升效率，为每一位作者打造专属的写作工具和语音模型。
+
+## 🤝 贡献指南
+
+欢迎对项目提出建议和贡献！
+
+1. Fork 本仓库
+2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 打开 Pull Request
+
+## 📄 许可证
+
+本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+
+## 📧 联系方式
+
+- GitHub: [@ChaserSu](https://github.com/ChaserSu)
+- 项目地址: [https://github.com/ChaserSu/DBInputNote](https://github.com/ChaserSu/DBInputNote)
+
+## 🎯 未来规划
+
+- [ ] 语音识别功能
+- [ ] 闲时语音模型自训练
+- [ ] 更完善的章节管理
+- [ ] 多格式导出功能
+- [ ] 云端同步
+- [ ] 转移至electron
+- [ ] 发布全平台的服务端和客户端
+
+---
+
+> 早岁已知世事艰，仍许飞鸿荡云间。
+> 一路寒风身如絮，命海沉浮客独行。
+> 千磨万击心铸铁，殚精竭虑铸一剑。
+> 今朝剑指叠云处，炼蛊炼人还炼天!
