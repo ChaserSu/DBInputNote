@@ -43,7 +43,7 @@ DBInputNote是一款专为网文作者设计的文本编辑器，在创作阶段
 ## 🚀 快速开始
 
 ### 环境要求
-- Python 3.7+
+- Python 3.10+
 - Flask
 - 其他依赖包（见requirements.txt）
 
