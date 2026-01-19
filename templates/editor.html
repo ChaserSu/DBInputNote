@@ -113,10 +113,24 @@
             margin-bottom: 10px;
         }
         
+        .paragraph-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
         .paragraph-number {
-            font-weight: 600;
-            color: #4a90e2;
+            font-weight: bold;
             font-size: 16px;
+            color: #333;
+        }
+        
+        .transcribe-delay {
+            font-size: 12px;
+            color: #666;
+            background-color: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 10px;
         }
         
         .paragraph-actions {
@@ -194,6 +208,12 @@
             outline: none;
             border-color: #4a90e2;
             box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+        }
+        
+        /* 当前编辑段落的高亮样式 */
+        .paragraph.editing {
+            border-color: #4a90e2;
+            box-shadow: 0 0 10px rgba(74, 144, 226, 0.3);
         }
         
         .recording-status {
@@ -310,6 +330,7 @@
             <div>
                 <a href="/" class="back-btn" style="margin-right: 10px;">← 返回书架</a>
                 <a href="/book/{{ book_id }}" class="back-btn">← 返回章节列表</a>
+                <button class="back-btn" id="toggle-preview-btn" onclick="togglePreview()">关闭预览</button>
             </div>
             <h1>分段编辑器 - 如我所述 如我所书</h1>
         </div>
@@ -339,11 +360,11 @@
         </div>
     </div>
     
-    <!-- 批量导入模态框 -->
+    <!-- 导入模态框 -->
     <div id="batch-import-modal" class="modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>批量导入段落</h3>
+                <h3>导入段落</h3>
             </div>
             <div class="form-group">
                 <label for="batch-text">请输入要导入的文本（每行一个段落）</label>
@@ -437,6 +458,8 @@
         // 添加请求锁定机制，确保每次只有一个API请求在处理
         let isProcessing = false;
         let pendingRequests = [];
+        // 预览状态
+        let isPreviewVisible = true;
         
         // 处理请求的函数，确保顺序执行
         function processRequest(requestFn) {
@@ -475,7 +498,39 @@
             if (paramChapterId) chapterId = paramChapterId;
             
             loadParagraphs();
+            
+            // 监听段落创建后的事件，为文本框添加焦点事件监听
+            document.addEventListener('focus', handleParagraphFocus, true);
         });
+        
+        // 处理段落焦点事件，实现磁铁效果
+        function handleParagraphFocus(event) {
+            const target = event.target;
+            if (target.classList.contains('paragraph-text')) {
+                // 移除所有段落的editing类
+                document.querySelectorAll('.paragraph').forEach(p => p.classList.remove('editing'));
+                
+                // 为当前段落添加editing类
+                const paragraph = target.closest('.paragraph');
+                paragraph.classList.add('editing');
+                
+                // 实现磁铁效果：将当前段落底部与编辑器面板底部对齐
+                const editorPanel = document.querySelector('.editor-panel');
+                const editorHeight = editorPanel.clientHeight;
+                const paragraphRect = paragraph.getBoundingClientRect();
+                const panelRect = editorPanel.getBoundingClientRect();
+                
+                // 计算需要滚动的距离
+                // 目标位置：段落底部 = 面板底部
+                const targetScrollPosition = editorPanel.scrollTop + (paragraphRect.bottom - panelRect.bottom) + 20; // 20px的间距
+                
+                // 平滑滚动到目标位置
+                editorPanel.scrollTo({
+                    top: targetScrollPosition,
+                    behavior: 'smooth'
+                });
+            }
+        }
         
         // 显示状态提示
         function showStatus(message, isSuccess = true) {
@@ -500,7 +555,7 @@
             }
         }
         
-        // 批量导入相关函数
+        // 导入相关函数
         function openBatchImportModal(paragraphId) {
             batchImportAfterId = paragraphId;
             const modal = document.getElementById('batch-import-modal');
@@ -631,12 +686,15 @@
             container.innerHTML = regularParagraphs.map((paragraph, index) => `
                 <div class="paragraph">
                     <div class="paragraph-header">
-                        <div class="paragraph-number">段落 ${index + 1}</div>
+                        <div class="paragraph-info">
+                            <span class="paragraph-number">段落 ${index + 1}</span>
+                            ${paragraph.transcribe_delay ? `<span class="transcribe-delay">转录延迟 ${paragraph.transcribe_delay} s</span>` : ''}
+                        </div>
                         <div class="paragraph-actions">
                             ${index > 0 ? `<button class="btn btn-secondary" onclick="moveParagraph('${paragraph.id}', 'up')">↑</button>` : ''}
                             ${index < regularParagraphs.length - 1 ? `<button class="btn btn-secondary" onclick="moveParagraph('${paragraph.id}', 'down')">↓</button>` : ''}
                             <button class="btn btn-danger" onclick="deleteParagraph('${paragraph.id}')">删除</button>
-                            <button class="btn btn-secondary" onclick="openBatchImportModal('${paragraph.id}')">批量导入</button>
+                            <button class="btn btn-secondary" onclick="openBatchImportModal('${paragraph.id}')">导入</button>
                         </div>
                     </div>
                     <div class="paragraph-content">
@@ -813,6 +871,8 @@
             }
         }
         
+        let recordingStartTime = null;
+        
         function startRecording(paragraphId) {
             // 停止之前的录音
             if (mediaRecorder && mediaRecorder.state === 'recording') {
@@ -821,6 +881,8 @@
             }
             
             recordingParagraphId = paragraphId;
+            // 记录录音开始时间
+            recordingStartTime = Date.now();
             
             // 更新UI
             renderParagraphs();
@@ -842,6 +904,8 @@
                         // 使用当前的recordingParagraphId
                         const currentId = recordingParagraphId;
                         const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        // 保存录音开始时间
+                        const startTime = recordingStartTime;
                         
                         // 停止所有音轨
                         stream.getTracks().forEach(track => track.stop());
@@ -849,10 +913,12 @@
                         // 重置状态
                         mediaRecorder = null;
                         audioChunks = [];
+                        recordingParagraphId = null;
+                        recordingStartTime = null;
                         
-                        // 上传录音
+                        // 上传录音，传递录音开始时间
                         if (currentId) {
-                            uploadAudio(currentId, audioBlob);
+                            uploadAudio(currentId, audioBlob, startTime);
                         }
                     };
                     
@@ -864,6 +930,7 @@
                     mediaRecorder = null;
                     audioChunks = [];
                     recordingParagraphId = null;
+                    recordingStartTime = null;
                     renderParagraphs();
                 });
         }
@@ -875,24 +942,28 @@
             // 注意：不要在这里重置recordingParagraphId，因为onstop事件会处理上传和状态重置
         }
         
-        function uploadAudio(paragraphId, audioBlob) {
-            // 使用processRequest确保请求顺序执行
-            processRequest(() => {
-                const formData = new FormData();
-                formData.append('audio', audioBlob, 'recording.wav');
-                
-                return fetch(`/api/chapter/${bookId}/${chapterId}/audio/upload/${paragraphId}`, {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
+        function uploadAudio(paragraphId, audioBlob, startTime) {
+            // 不使用processRequest队列，直接发送请求，提高音频上传优先级
+            const formData = new FormData();
+            formData.append('audio', audioBlob, 'recording.wav');
+            formData.append('start_time', startTime);
+            
+            fetch(`/api/chapter/${bookId}/${chapterId}/audio/upload/${paragraphId}`, {
+                method: 'POST',
+                body: formData
             })
+            .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     // 更新本地数据
                     const paragraph = paragraphs.find(p => p.id === paragraphId);
                     if (paragraph) {
                         paragraph.audio = data.paragraph.audio;
+                    }
+                    
+                    // 调用语音识别API
+                    if (data.audio_path) {
+                        recognizeAudio(data.audio_path, paragraphId, data.start_time);
                     }
                 }
                 // 无论成功失败，都重置状态
@@ -904,6 +975,33 @@
                 // 重置状态
                 recordingParagraphId = null;
                 renderParagraphs();
+            });
+        }
+        
+        // 调用语音识别API
+        function recognizeAudio(audioPath, paragraphId, startTime) {
+            // 直接发送请求，不使用队列，提高语音识别优先级
+            fetch('/api/recognize-audio', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    audio_path: audioPath,
+                    start_time: startTime
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 重新加载所有段落，确保识别结果已经正确保存并显示
+                    loadParagraphs();
+                } else {
+                    console.error('Voice recognition failed:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error recognizing audio:', error);
             });
         }
         
@@ -954,6 +1052,31 @@
                     console.error('复制失败:', err);
                     showStatus('复制失败，请手动复制', false);
                 });
+        }
+        
+        // 切换预览面板显示状态
+        function togglePreview() {
+            isPreviewVisible = !isPreviewVisible;
+            const toggleBtn = document.getElementById('toggle-preview-btn');
+            const editorLayout = document.querySelector('.editor-layout');
+            const previewPanel = document.querySelector('.preview-panel');
+            const editorPanel = document.querySelector('.editor-panel');
+            
+            if (isPreviewVisible) {
+                // 开启预览
+                toggleBtn.textContent = '关闭预览';
+                // 恢复双列布局
+                editorLayout.style.gridTemplateColumns = '1fr 1fr';
+                previewPanel.style.display = 'block';
+                editorPanel.style.borderRight = '1px solid #eee';
+            } else {
+                // 关闭预览
+                toggleBtn.textContent = '开启预览';
+                // 切换为单列布局
+                editorLayout.style.gridTemplateColumns = '1fr';
+                previewPanel.style.display = 'none';
+                editorPanel.style.borderRight = 'none';
+            }
         }
     </script>
 </body>
