@@ -4,7 +4,8 @@
 [![GitHub Forks](https://img.shields.io/github/forks/ChaserSu/DBInputNote?style=social)](https://github.com/ChaserSu/DBInputNote)
 
 > 【这是一个超早期的demo，请勿用于生产环境】
-> 【v0.0.3版本已支持语音识别，但识别延迟问题仍在解决】
+
+> 【v0.0.3版本已支持语音识别，但识别延迟问题仍在解决，仅作为功能演示🤣我自己也用不下去】
 
 ## 📖 项目简介
 
