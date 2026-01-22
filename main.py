@@ -59,7 +59,7 @@ def generate_cli_qrcode(data):
 
 if __name__ == '__main__':
     # 配置参数
-    CURRENT_VERSION = "0.0.2"
+    CURRENT_VERSION = "0.0.4"
     GITHUB_REPO = "ChaserSu/DBInputNote"  # GitHub 用户名/仓库名
     port = 5001
     
@@ -170,3 +170,4 @@ if __name__ == '__main__':
         print(f"启动应用失败：{str(e)}")
         print("程序启动失败，即将退出...")
         sys.exit(1)
+
